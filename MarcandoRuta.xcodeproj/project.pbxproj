@@ -14,6 +14,7 @@
 		81D2F2381C7EA065004C90DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81D2F2371C7EA065004C90DD /* Assets.xcassets */; };
 		81D2F23B1C7EA065004C90DD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81D2F2391C7EA065004C90DD /* LaunchScreen.storyboard */; };
 		81D2F2431C7EBECD004C90DD /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81D2F2421C7EBECC004C90DD /* CoreLocation.framework */; };
+		81D2F26E1C82539F004C90DD /* PublicArt.json in Resources */ = {isa = PBXBuildFile; fileRef = 81D2F26D1C82539F004C90DD /* PublicArt.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		81D2F23A1C7EA065004C90DD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		81D2F23C1C7EA065004C90DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		81D2F2421C7EBECC004C90DD /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		81D2F26D1C82539F004C90DD /* PublicArt.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = PublicArt.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 				81D2F2311C7EA065004C90DD /* Main.storyboard */,
 				81D2F2371C7EA065004C90DD /* Assets.xcassets */,
 				81D2F2391C7EA065004C90DD /* LaunchScreen.storyboard */,
+				81D2F26D1C82539F004C90DD /* PublicArt.json */,
 				81D2F23C1C7EA065004C90DD /* Info.plist */,
 				81D2F2341C7EA065004C90DD /* MarcandoRuta.xcdatamodeld */,
 			);
@@ -130,6 +133,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81D2F26E1C82539F004C90DD /* PublicArt.json in Resources */,
 				81D2F23B1C7EA065004C90DD /* LaunchScreen.storyboard in Resources */,
 				81D2F2381C7EA065004C90DD /* Assets.xcassets in Resources */,
 				81D2F2331C7EA065004C90DD /* Main.storyboard in Resources */,
@@ -295,6 +299,7 @@
 				81D2F2411C7EA065004C90DD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
