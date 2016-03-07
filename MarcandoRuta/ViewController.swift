@@ -19,9 +19,6 @@ class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelega
 
     @IBOutlet weak var mapa: MKMapView!
     @IBOutlet weak var segmentControl: UISegmentedControl!
-    @IBOutlet weak var timeLabel: UILabel!
-    @IBOutlet weak var distanceLabel: UILabel!
-    @IBOutlet weak var paceLabel: UILabel!
     
     
 //*************Variables
