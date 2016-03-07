@@ -7,10 +7,8 @@
 //
 
 import UIKit
-import CoreData
 import CoreLocation
 import MapKit
-import AddressBook
 import HealthKit
 
 class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelegate {
@@ -53,6 +51,7 @@ class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelega
     var seconds = 0.0
     var timer = NSTimer()
     var distanciaTotal:Int =  0
+    var distanciaCincuenta = 0
     
     
 //***********ViewDidLoad
@@ -75,13 +74,8 @@ class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelega
 
         
         
-        //reconocer gesto de presion
-        let uilpgr = UILongPressGestureRecognizer(target: self, action: "action:")
-        uilpgr.minimumPressDuration = 2 //tiempo de reconocimiento del gesto en segundos
-        mapa.addGestureRecognizer(uilpgr)
-    
+        //añadirPin
         
-
     }
     
     
@@ -92,32 +86,38 @@ class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelega
         
         seconds++
         
+        
         //Aqui vamos sumar las distancias
         if seconds > 1 {
             
             
             distanciaTotal += Int(round(distancia))
-            print(distanciaTotal)
+            print("Distancia recorrida : \(distanciaTotal) m")
+           
+            if distanciaTotal >= 50 && distanciaTotal <= 58 {
+                
+                
+                //poner Pin
+                location = CLLocationCoordinate2DMake(userLatitude, userLongitude)
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = location
+                annotation.title = "Lat: \(userLatitude), lon: \(userLatitude)"
+                annotation.subtitle = "\(distanciaTotal) "
+                mapa.addAnnotation(annotation)
+                
+                print(distanciaTotal)
+                
+        
+            }else{
+                
+            }
 
         }else{
             
             distancia = 0.0
         
         }
-        
-
-        
-        if distanciaTotal >= 50 && distanciaTotal <= 54 {
-                
-                //annotation
-                location = CLLocationCoordinate2DMake(userLatitude, userLongitude)
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = location
-                annotation.title = "Lat: \(userLatitude), lon: \(userLatitude)"
-                annotation.subtitle = "\(distanciaTotal) "
-                
-                mapa.addAnnotation(annotation)
-            }
+    
 
     }
 
@@ -142,9 +142,11 @@ class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelega
         span = MKCoordinateSpanMake(latUserDelta, longUserDelta)
         region = MKCoordinateRegionMake(location, span)
         mapa.setRegion(region, animated: true)
+        
     
         
     }
+
     
 //**********Función de los tipos de mapas
     @IBAction func segmentedControlAction(sender: UISegmentedControl) {
