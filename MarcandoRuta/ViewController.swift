@@ -9,144 +9,124 @@
 import UIKit
 import CoreLocation
 import MapKit
-import HealthKit
+
 
 class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelegate {
     
 //*************Outlets
-
     @IBOutlet weak var mapa: MKMapView!
     @IBOutlet weak var segmentControl: UISegmentedControl!
     
     
 //*************Variables
+    var originExist = false
+    var origin:CLLocation?
     
-    //location
-    var latitudeInit: CLLocationDegrees!                //longitud inicial
-    var longitudeInit:CLLocationDegrees!                //latitud inicial
-    var locationInit: CLLocation!                       //locación inicial
-    
-    //zoom
-    var latUserDelta: CLLocationDegrees!                //zoom
-    var longUserDelta: CLLocationDegrees!               //zoom
-    var span: MKCoordinateSpan!                         // obtiene el zoom
-    
-    var location: CLLocationCoordinate2D!               // obtiene la localización
-    var region: MKCoordinateRegion!                     // obtiene la region con "location" y "span"
-    
-    var newCoordinate: CLLocationCoordinate2D!          //nueva coordenada segun donde presione
-    
-    //User
-    var userLocation: CLLocation!
-    var userLatitude: CLLocationDegrees!
-    var userLongitude: CLLocationDegrees!
+    let manager = CLLocationManager()
 
-    
-    //locationManajer
-    var locationManager = CLLocationManager()
-    
-    
-    //distancia
-    var distancia = 0.0
-    var seconds = 0.0
-    var timer = NSTimer()
-    var distanciaTotal:Int =  0
-    var distanciaCincuenta = 0
-    
     
 //***********ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //locationManager
-        locationManager.delegate = self                             //se delegal al viewControllew
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest   // la mejor presición
-        locationManager.requestWhenInUseAuthorization()             //requerir autorización al estar en uso
-        locationManager.startUpdatingLocation()                     //empezar la localización
-        mapa.showsUserLocation = true                               //mostrar usuario
+        //inicializamos el manejador
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.distanceFilter = 50
+        manager.requestWhenInUseAuthorization()
+        
+        
+        
+        if let latitude = manager.location?.coordinate.latitude, let longitude = manager.location?.coordinate.longitude{
+            
+            //locacion en el mapa
+            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+            self.mapa.setRegion(region, animated: true)
+            
+            
+            //añadimos pin de Inicio
+            let pinLocation = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            
+            let InicioPin:MKPointAnnotation = MKPointAnnotation()
+            InicioPin.title = "Inicio"
+            InicioPin.coordinate = pinLocation
+            mapa.addAnnotation(InicioPin)
+            
+        }else{
+        
+            Alerta(title: "error", message: "No podemos localizar tu ubicación")
+            
+        }
+        
 
+}
 
-        
-        //Timer
-        timer.invalidate()
-        timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: "eachSecond:", userInfo: nil, repeats: true)
-        eachSecond(timer)
-
-        
-        
-        //añadirPin
-        
+//**********autorizarLocalización
+    func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
+        if status == .AuthorizedWhenInUse {
+            manager.startUpdatingLocation()
+            mapa.showsUserLocation = true
+        } else {
+            manager.stopUpdatingLocation()
+            mapa.showsUserLocation = false
+        }
     }
     
+
+
     
-//********CadaSegundo
     
-    //esta funcion será llamada cada segundo
-    func eachSecond(timer:NSTimer ){
+//*********DidUpdateLocations
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        seconds++
-        
-        
-        //Aqui vamos sumar las distancias
-        if seconds > 1 {
+        if let latitude = manager.location?.coordinate.latitude, let longitude = manager.location?.coordinate.longitude{
+            
+            //si no existe un origen le indicamos el origen
+            if !originExist{
+                origin = CLLocation(latitude: latitude, longitude: longitude)
+                originExist = true
+            }
+            
+            //monitoreamos las nuevas coordenadas
+            let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+            self.mapa.setRegion(region, animated: true)
             
             
-            distanciaTotal += Int(round(distancia))
-            print("Distancia recorrida : \(distanciaTotal) m")
-           
-            if distanciaTotal >= 50 && distanciaTotal <= 58 {
-                
-                
-                //poner Pin
-                location = CLLocationCoordinate2DMake(userLatitude, userLongitude)
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = location
-                annotation.title = "Lat: \(userLatitude), lon: \(userLatitude)"
-                annotation.subtitle = "\(distanciaTotal) "
-                mapa.addAnnotation(annotation)
-                
-                print(distanciaTotal)
-                
-        
+            
+            //Creamos el Pin
+            let pin = MKPointAnnotation()
+            pin.coordinate = location
+            pin.title = "Latitud: \(Double(round(latitude * 100/100))), Longitud: \(Double(round(longitude * 100/100)))"
+            
+            if let punto = origin {
+            
+                pin.subtitle = "Distancia Recorrida: \(Double(round(manager.location!.distanceFromLocation(punto) * 100)/100))"
+            
             }else{
                 
+                print("No hay punto de partida.")
+                
             }
-
+            
+            self.mapa.addAnnotation(pin)
+            
         }else{
             
-            distancia = 0.0
-        
+            Alerta(title: "Error", message: "No se puede localizar tu ubicación")
+            
         }
     
-
     }
 
-    
-    
-//
-    func locationManager(manager: CLLocationManager, var didUpdateLocations locations: [CLLocation]) {
-        
-        self.userLocation = locations[0]
-        userLatitude = userLocation.coordinate.latitude             //latitud usuario
-        userLongitude = userLocation.coordinate.longitude           //longitud usuario
-        distancia = userLocation.speed                              //velocidad del usuario en bicicleta
-        //print(locations)
-        
 
+//*********DidFailWithError
+    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+        
+        print("\(error)")
     
-        //locacion en el mapa
-        latUserDelta = 0.01                                         //zoom
-        longUserDelta = 0.01                                        //zoom
-        
-        location = CLLocationCoordinate2DMake(userLatitude, userLongitude)
-        span = MKCoordinateSpanMake(latUserDelta, longUserDelta)
-        region = MKCoordinateRegionMake(location, span)
-        mapa.setRegion(region, animated: true)
-        
-    
-        
     }
-
     
 //**********Función de los tipos de mapas
     @IBAction func segmentedControlAction(sender: UISegmentedControl) {
@@ -163,6 +143,17 @@ class ViewController: UIViewController,MKMapViewDelegate,CLLocationManagerDelega
         }
     }
 
+    
+//*********Alerta
+    func Alerta(title title: String, message: String){
+        let alerta = UIAlertController(title: title, message: message, preferredStyle: .Alert)
+        let OK = UIAlertAction(title: "OK", style: .Default, handler: nil)
+        alerta.addAction(OK)
+        self.presentViewController(alerta, animated: true, completion: nil)
+        
+    
+    }
+    
 
 }
 
